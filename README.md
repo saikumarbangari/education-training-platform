@@ -1,6 +1,6 @@
-# Waypoint Learning
+# Education / Training Platform
 
-Waypoint Learning is a small React frontend for discovering short digital-skills courses, enrolling, and tracking module progress. It was designed for ICT930 Assessment 2.
+Waypoint Learning is the product created for this Education / Training Platform project. It is a small React frontend for discovering short digital-skills courses, enrolling, and tracking module progress. It was designed for ICT930 Assessment 2.
 
 ## Main features
 

@@ -59,8 +59,8 @@ export default function AppLayout() {
 
       <footer className="site-footer">
         <div>
-          <strong>Waypoint Learning</strong>
-          <span> A student frontend project for ICT930.</span>
+          <strong>Education / Training Platform</strong>
+          <span> Waypoint Learning · ICT930.</span>
         </div>
       </footer>
     </>
