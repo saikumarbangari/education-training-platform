@@ -1,0 +1,92 @@
+[
+  {
+    "id": "web-foundations",
+    "title": "Web Foundations",
+    "category": "Web development",
+    "level": "Beginner",
+    "duration": "4 weeks",
+    "summary": "Build a small, well-structured website with HTML and CSS, then publish it online.",
+    "outcome": "You will finish with a responsive three-page website you can explain and improve.",
+    "skills": ["HTML", "CSS", "responsive layout"],
+    "modules": [
+      { "id": "structure", "title": "Structure a useful page" },
+      { "id": "style", "title": "Build a flexible layout" },
+      { "id": "publish", "title": "Check and publish your site" }
+    ]
+  },
+  {
+    "id": "accessible-interfaces",
+    "title": "Accessible Interfaces",
+    "category": "Web development",
+    "level": "Intermediate",
+    "duration": "3 weeks",
+    "summary": "Make forms, navigation, and common interface patterns easier for more people to use.",
+    "outcome": "You will audit and improve an interface for keyboard, screen reader, and low-vision users.",
+    "skills": ["semantic HTML", "keyboard access", "WCAG"],
+    "modules": [
+      { "id": "semantics", "title": "Start with meaningful HTML" },
+      { "id": "input", "title": "Design for keyboard and touch" },
+      { "id": "audit", "title": "Run an accessibility check" }
+    ]
+  },
+  {
+    "id": "everyday-data",
+    "title": "Everyday Data Skills",
+    "category": "Data",
+    "level": "Beginner",
+    "duration": "3 weeks",
+    "summary": "Clean a small dataset, answer practical questions, and share what you found clearly.",
+    "outcome": "You will turn a messy spreadsheet into a short, evidence-based summary.",
+    "skills": ["spreadsheets", "data cleaning", "basic analysis"],
+    "modules": [
+      { "id": "questions", "title": "Ask a useful data question" },
+      { "id": "clean", "title": "Clean and organise the data" },
+      { "id": "explain", "title": "Explain the result" }
+    ]
+  },
+  {
+    "id": "data-stories",
+    "title": "Data Stories",
+    "category": "Data",
+    "level": "Intermediate",
+    "duration": "4 weeks",
+    "summary": "Choose honest charts and combine them into a focused story for a real audience.",
+    "outcome": "You will create a concise visual report with a clear recommendation.",
+    "skills": ["data visualisation", "chart choice", "storytelling"],
+    "modules": [
+      { "id": "audience", "title": "Know the audience and question" },
+      { "id": "chart", "title": "Choose and refine the chart" },
+      { "id": "story", "title": "Build the final data story" }
+    ]
+  },
+  {
+    "id": "plan-projects",
+    "title": "Plan Better Projects",
+    "category": "Professional skills",
+    "level": "Beginner",
+    "duration": "2 weeks",
+    "summary": "Turn a broad idea into a realistic scope, task list, and simple delivery plan.",
+    "outcome": "You will leave with a project plan that your team can actually follow.",
+    "skills": ["scope", "task planning", "risk checks"],
+    "modules": [
+      { "id": "scope", "title": "Define the useful outcome" },
+      { "id": "tasks", "title": "Break work into clear tasks" },
+      { "id": "review", "title": "Review risks and responsibilities" }
+    ]
+  },
+  {
+    "id": "digital-teams",
+    "title": "Working in Digital Teams",
+    "category": "Professional skills",
+    "level": "Intermediate",
+    "duration": "3 weeks",
+    "summary": "Use clear handovers, helpful feedback, and version control in a small digital project.",
+    "outcome": "You will complete a team workflow exercise with a traceable contribution history.",
+    "skills": ["Git", "code review", "team communication"],
+    "modules": [
+      { "id": "workflow", "title": "Agree on a team workflow" },
+      { "id": "changes", "title": "Make and review changes" },
+      { "id": "handover", "title": "Finish with a clear handover" }
+    ]
+  }
+]
