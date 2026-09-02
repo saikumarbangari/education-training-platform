@@ -5,7 +5,7 @@ Waypoint Learning is the product created for this Education / Training Platform 
 ## Main features
 
 - Multi-view navigation with React Router.
-- Six courses loaded asynchronously from local JSON.
+- Ten programming courses loaded asynchronously from local JSON.
 - Search plus category and level filters.
 - Course detail pages and a validated enrolment form.
 - Shared enrolment/progress state using React Context.
@@ -87,10 +87,3 @@ Six assessment-ready screenshots are saved in `screenshots/`:
 
 - Discover, Course details, and My learning at desktop size.
 - Discover, Enrolment, and Progress at mobile size.
-
-## Submission reminders
-
-- Replace the deployment placeholder above.
-- Capture at least six key screens across desktop and mobile.
-- Include the source ZIP, GitHub repository link, reflection, and team contribution statement.
-- Check that all three team members have regular, meaningful commits.
