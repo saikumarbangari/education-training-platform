@@ -78,7 +78,7 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
               autoComplete="off"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Try HTML or teamwork…"
+              placeholder="Try Python or JavaScript…"
             />
           </div>
           <div className="field">

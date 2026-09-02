@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { courseProgress, filterCourses } from "../src/utils/courses.js";
 import { validateEnrolment } from "../src/utils/validation.js";
+
+const courseData = JSON.parse(
+  readFileSync(new URL("../public/data/courses.json", import.meta.url), "utf8"),
+);
 
 const courses = [
   {
@@ -25,6 +30,11 @@ const courses = [
 test("course filters work together", () => {
   assert.deepEqual(filterCourses(courses, "css", "Web development", "Beginner"), [courses[0]]);
   assert.equal(filterCourses(courses, "missing").length, 0);
+});
+
+test("course catalogue contains at least ten unique courses", () => {
+  assert.ok(courseData.length >= 10);
+  assert.equal(new Set(courseData.map((course) => course.id)).size, courseData.length);
 });
 
 test("enrolment validation catches missing details", () => {

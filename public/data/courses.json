@@ -1,92 +1,152 @@
 [
   {
-    "id": "web-foundations",
-    "title": "Web Foundations",
-    "category": "Web development",
+    "id": "python-basics",
+    "title": "Python Basics",
+    "category": "General programming",
     "level": "Beginner",
     "duration": "4 weeks",
-    "summary": "Build a small, well-structured website with HTML and CSS, then publish it online.",
-    "outcome": "You will finish with a responsive three-page website you can explain and improve.",
-    "skills": ["HTML", "CSS", "responsive layout"],
+    "summary": "Learn Python syntax, variables, decisions, and loops by building small practical programs.",
+    "outcome": "You will finish with a working command-line quiz that you can explain and improve.",
+    "skills": ["Python", "problem solving", "command line"],
     "modules": [
-      { "id": "structure", "title": "Structure a useful page" },
-      { "id": "style", "title": "Build a flexible layout" },
-      { "id": "publish", "title": "Check and publish your site" }
+      { "id": "python-values", "title": "Work with values and variables" },
+      { "id": "python-choices", "title": "Add decisions and loops" },
+      { "id": "python-project", "title": "Build a small quiz" }
     ]
   },
   {
-    "id": "accessible-interfaces",
-    "title": "Accessible Interfaces",
-    "category": "Web development",
+    "id": "javascript-essentials",
+    "title": "JavaScript Essentials",
+    "category": "Web programming",
+    "level": "Beginner",
+    "duration": "4 weeks",
+    "summary": "Use JavaScript to respond to clicks, update page content, and check simple form input.",
+    "outcome": "You will build an interactive web page using clear, easy-to-follow JavaScript.",
+    "skills": ["JavaScript", "DOM", "events"],
+    "modules": [
+      { "id": "javascript-values", "title": "Store and compare values" },
+      { "id": "javascript-dom", "title": "Change a web page" },
+      { "id": "javascript-project", "title": "Build an interactive page" }
+    ]
+  },
+  {
+    "id": "java-fundamentals",
+    "title": "Java Fundamentals",
+    "category": "General programming",
+    "level": "Beginner",
+    "duration": "5 weeks",
+    "summary": "Learn Java classes, methods, and collections through a simple student record program.",
+    "outcome": "You will create a small Java application that stores and displays student records.",
+    "skills": ["Java", "classes", "collections"],
+    "modules": [
+      { "id": "java-syntax", "title": "Write your first Java program" },
+      { "id": "java-classes", "title": "Organise code with classes" },
+      { "id": "java-project", "title": "Build a record manager" }
+    ]
+  },
+  {
+    "id": "csharp-foundations",
+    "title": "C# Foundations",
+    "category": "General programming",
+    "level": "Beginner",
+    "duration": "4 weeks",
+    "summary": "Explore C# types, methods, and objects while creating a basic task-list program.",
+    "outcome": "You will complete a console task list with options to add and review tasks.",
+    "skills": ["C#", ".NET", "objects"],
+    "modules": [
+      { "id": "csharp-types", "title": "Use types and variables" },
+      { "id": "csharp-methods", "title": "Split work into methods" },
+      { "id": "csharp-project", "title": "Build a task list" }
+    ]
+  },
+  {
+    "id": "cpp-starter",
+    "title": "C++ Starter",
+    "category": "General programming",
     "level": "Intermediate",
-    "duration": "3 weeks",
-    "summary": "Make forms, navigation, and common interface patterns easier for more people to use.",
-    "outcome": "You will audit and improve an interface for keyboard, screen reader, and low-vision users.",
-    "skills": ["semantic HTML", "keyboard access", "WCAG"],
+    "duration": "5 weeks",
+    "summary": "Practise C++ functions, vectors, and references through short problem-solving exercises.",
+    "outcome": "You will build a menu-based score tracker and understand how its data is stored.",
+    "skills": ["C++", "functions", "vectors"],
     "modules": [
-      { "id": "semantics", "title": "Start with meaningful HTML" },
-      { "id": "input", "title": "Design for keyboard and touch" },
-      { "id": "audit", "title": "Run an accessibility check" }
+      { "id": "cpp-functions", "title": "Create reusable functions" },
+      { "id": "cpp-vectors", "title": "Store values in vectors" },
+      { "id": "cpp-project", "title": "Build a score tracker" }
     ]
   },
   {
-    "id": "everyday-data",
-    "title": "Everyday Data Skills",
-    "category": "Data",
+    "id": "php-web-basics",
+    "title": "PHP for the Web",
+    "category": "Web programming",
     "level": "Beginner",
     "duration": "3 weeks",
-    "summary": "Clean a small dataset, answer practical questions, and share what you found clearly.",
-    "outcome": "You will turn a messy spreadsheet into a short, evidence-based summary.",
-    "skills": ["spreadsheets", "data cleaning", "basic analysis"],
+    "summary": "Use PHP to process a form, work with arrays, and create a small dynamic web page.",
+    "outcome": "You will build a simple feedback page that checks and displays submitted information.",
+    "skills": ["PHP", "forms", "server-side code"],
     "modules": [
-      { "id": "questions", "title": "Ask a useful data question" },
-      { "id": "clean", "title": "Clean and organise the data" },
-      { "id": "explain", "title": "Explain the result" }
+      { "id": "php-syntax", "title": "Add PHP to a page" },
+      { "id": "php-forms", "title": "Read and check form data" },
+      { "id": "php-project", "title": "Build a feedback page" }
     ]
   },
   {
-    "id": "data-stories",
-    "title": "Data Stories",
-    "category": "Data",
+    "id": "ruby-basics",
+    "title": "Ruby Basics",
+    "category": "Web programming",
+    "level": "Beginner",
+    "duration": "3 weeks",
+    "summary": "Learn Ruby methods, arrays, and hashes by creating a small text-based organiser.",
+    "outcome": "You will make a readable Ruby program that sorts and displays a personal book list.",
+    "skills": ["Ruby", "methods", "hashes"],
+    "modules": [
+      { "id": "ruby-values", "title": "Work with Ruby values" },
+      { "id": "ruby-collections", "title": "Use arrays and hashes" },
+      { "id": "ruby-project", "title": "Build a book organiser" }
+    ]
+  },
+  {
+    "id": "swift-app-basics",
+    "title": "Swift App Basics",
+    "category": "Mobile development",
     "level": "Intermediate",
     "duration": "4 weeks",
-    "summary": "Choose honest charts and combine them into a focused story for a real audience.",
-    "outcome": "You will create a concise visual report with a clear recommendation.",
-    "skills": ["data visualisation", "chart choice", "storytelling"],
+    "summary": "Use Swift types, optionals, and functions to prepare for simple iOS app development.",
+    "outcome": "You will create the working logic for a small habit-tracking application.",
+    "skills": ["Swift", "optionals", "app logic"],
     "modules": [
-      { "id": "audience", "title": "Know the audience and question" },
-      { "id": "chart", "title": "Choose and refine the chart" },
-      { "id": "story", "title": "Build the final data story" }
+      { "id": "swift-types", "title": "Understand Swift types" },
+      { "id": "swift-functions", "title": "Write safe functions" },
+      { "id": "swift-project", "title": "Build habit tracker logic" }
     ]
   },
   {
-    "id": "plan-projects",
-    "title": "Plan Better Projects",
-    "category": "Professional skills",
-    "level": "Beginner",
-    "duration": "2 weeks",
-    "summary": "Turn a broad idea into a realistic scope, task list, and simple delivery plan.",
-    "outcome": "You will leave with a project plan that your team can actually follow.",
-    "skills": ["scope", "task planning", "risk checks"],
-    "modules": [
-      { "id": "scope", "title": "Define the useful outcome" },
-      { "id": "tasks", "title": "Break work into clear tasks" },
-      { "id": "review", "title": "Review risks and responsibilities" }
-    ]
-  },
-  {
-    "id": "digital-teams",
-    "title": "Working in Digital Teams",
-    "category": "Professional skills",
+    "id": "kotlin-android-basics",
+    "title": "Kotlin for Android",
+    "category": "Mobile development",
     "level": "Intermediate",
-    "duration": "3 weeks",
-    "summary": "Use clear handovers, helpful feedback, and version control in a small digital project.",
-    "outcome": "You will complete a team workflow exercise with a traceable contribution history.",
-    "skills": ["Git", "code review", "team communication"],
+    "duration": "4 weeks",
+    "summary": "Learn Kotlin classes, null safety, and collections with examples suited to Android apps.",
+    "outcome": "You will build the data and logic for a basic mobile shopping-list application.",
+    "skills": ["Kotlin", "null safety", "Android basics"],
     "modules": [
-      { "id": "workflow", "title": "Agree on a team workflow" },
-      { "id": "changes", "title": "Make and review changes" },
-      { "id": "handover", "title": "Finish with a clear handover" }
+      { "id": "kotlin-syntax", "title": "Read and write Kotlin" },
+      { "id": "kotlin-data", "title": "Model simple app data" },
+      { "id": "kotlin-project", "title": "Build shopping-list logic" }
+    ]
+  },
+  {
+    "id": "sql-foundations",
+    "title": "SQL Foundations",
+    "category": "Data and databases",
+    "level": "Beginner",
+    "duration": "3 weeks",
+    "summary": "Write SQL queries to select, filter, join, and summarise information from a database.",
+    "outcome": "You will answer a set of practical business questions using clear SQL queries.",
+    "skills": ["SQL", "queries", "databases"],
+    "modules": [
+      { "id": "sql-select", "title": "Select and filter records" },
+      { "id": "sql-join", "title": "Combine related tables" },
+      { "id": "sql-report", "title": "Create a short data report" }
     ]
   }
 ]
