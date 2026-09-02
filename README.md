@@ -77,7 +77,7 @@ Hash-based routing keeps every view usable on simple static hosting without serv
 
 ## Deployment
 
-Deployed application URL: **Add the public URL before submission.**
+Deployed application URL: [https://saikumarbangari.github.io/education-training-platform/](https://saikumarbangari.github.io/education-training-platform/)
 
 Build the site with `npm run build`, deploy the `dist` folder, and then test every route, form, data state, and mobile layout on the public URL.
 
