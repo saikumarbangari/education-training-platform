@@ -39,6 +39,7 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
     })
     .filter(Boolean);
   const completed = records.filter((record) => record.progress === 100).length;
+  const notStarted = records.filter((record) => record.progress === 0).length;
   const inProgress = records.filter(
     (record) => record.progress > 0 && record.progress < 100,
   ).length;
@@ -77,6 +78,10 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
               <div>
                 <dt>Enrolled</dt>
                 <dd>{records.length}</dd>
+              </div>
+              <div>
+                <dt>Not started</dt>
+                <dd>{notStarted}</dd>
               </div>
               <div>
                 <dt>In progress</dt>

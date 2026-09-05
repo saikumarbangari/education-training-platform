@@ -1019,7 +1019,7 @@ progress::-moz-progress-bar {
 
 .progress-ledger dl {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   margin: 0;
   border: 1px solid var(--rule);
 }
