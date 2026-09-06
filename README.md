@@ -80,10 +80,3 @@ Hash-based routing keeps every view usable on simple static hosting without serv
 Deployed application URL: [https://saikumarbangari.github.io/education-training-platform/](https://saikumarbangari.github.io/education-training-platform/)
 
 Build the site with `npm run build`, deploy the `dist` folder, and then test every route, form, data state, and mobile layout on the public URL.
-
-## Screenshots
-
-Six assessment-ready screenshots are saved in `screenshots/`:
-
-- Discover, Course details, and My learning at desktop size.
-- Discover, Enrolment, and Progress at mobile size.
