@@ -22,7 +22,11 @@ export default function CoursePage({ courses, loading, error, onRetry }) {
         title="Course unavailable"
         headingLevel="h1"
         action={
-          <button className="button button--small" type="button" onClick={onRetry}>
+          <button
+            className="button button--small"
+            type="button"
+            onClick={onRetry}
+          >
             Try again
           </button>
         }
@@ -106,6 +110,12 @@ export default function CoursePage({ courses, loading, error, onRetry }) {
               <li key={skill}>{skill}</li>
             ))}
           </ul>
+          {course.venueName && (
+            <p className="venue-note">
+              <strong>In-person venue:</strong> {course.venueName}. Use
+              Attendance to check in when you arrive.
+            </p>
+          )}
           {enrolled ? (
             <Link className="button button--success" to="/learning">
               Continue learning

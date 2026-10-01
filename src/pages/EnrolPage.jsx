@@ -2,16 +2,22 @@ import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Feedback from "../components/Feedback.jsx";
 import { useLearning } from "../context/LearningContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import { validateEnrolment } from "../utils/validation.js";
-
-const emptyForm = { fullName: "", email: "", goal: "", agreed: false };
 
 export default function EnrolPage({ courses, loading, error, onRetry }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const summaryRef = useRef(null);
-  const { enrolments, enrol } = useLearning();
-  const [values, setValues] = useState(emptyForm);
+  const { enrolments, enrol, pending } = useLearning();
+  const { user } = useAuth();
+  const [values, setValues] = useState({
+    fullName: user.fullName,
+    email: user.email,
+    goal: "",
+    agreed: false,
+  });
+  const [submitError, setSubmitError] = useState("");
   const [errors, setErrors] = useState({});
   const course = courses.find((item) => item.id === courseId);
 
@@ -30,7 +36,11 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
         title="Enrolment unavailable"
         headingLevel="h1"
         action={
-          <button className="button button--small" type="button" onClick={onRetry}>
+          <button
+            className="button button--small"
+            type="button"
+            onClick={onRetry}
+          >
             Try again
           </button>
         }
@@ -85,8 +95,10 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
     }
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    if (pending.includes(courseId)) return;
+    setSubmitError("");
     const nextErrors = validateEnrolment(values);
     setErrors(nextErrors);
 
@@ -95,14 +107,16 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
       return;
     }
 
-    enrol(course.id, {
-      fullName: values.fullName.trim(),
-      email: values.email.trim(),
-      goal: values.goal.trim(),
-    });
-    navigate("/learning", {
-      state: { notice: `You are enrolled in ${course.title}.` },
-    });
+    try {
+      await enrol(course.id, { goal: values.goal.trim() });
+      navigate("/learning", {
+        state: { notice: `You are enrolled in ${course.title}.` },
+      });
+    } catch (error) {
+      setSubmitError(error.message);
+      setErrors(error.errors || {});
+      requestAnimationFrame(() => summaryRef.current?.focus());
+    }
   }
 
   return (
@@ -131,14 +145,21 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
             <span aria-hidden="true">01</span>
             <div>
               <h2>Your details</h2>
-              <p>All fields are required.</p>
+              <p>
+                Your account details are already filled in. Add your learning
+                goal.
+              </p>
             </div>
           </div>
 
-          {Object.keys(errors).length > 0 && (
-            <div className="error-summary" ref={summaryRef} tabIndex="-1" role="alert">
-              <strong>Check the highlighted fields.</strong>
-              <p>There are {Object.keys(errors).length} items to fix.</p>
+          {(submitError || Object.keys(errors).length > 0) && (
+            <div
+              className="error-summary"
+              ref={summaryRef}
+              tabIndex="-1"
+              role="alert"
+            >
+              <strong>{submitError || "Check the highlighted fields."}</strong>
             </div>
           )}
 
@@ -147,6 +168,7 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
             <input
               id="fullName"
               name="fullName"
+              readOnly
               autoComplete="name"
               value={values.fullName}
               onChange={updateField}
@@ -165,6 +187,7 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
             <input
               id="email"
               name="email"
+              readOnly
               type="email"
               autoComplete="email"
               spellCheck="false"
@@ -174,7 +197,7 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
               aria-describedby={errors.email ? "email-error" : "email-hint"}
             />
             <span className="field-hint" id="email-hint">
-              Used only for this project demonstration.
+              This enrolment will be saved to your signed-in account.
             </span>
             {errors.email && (
               <span className="field-error" id="email-error">
@@ -189,6 +212,7 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
               id="goal"
               name="goal"
               rows="4"
+              maxLength="500"
               autoComplete="off"
               value={values.goal}
               onChange={updateField}
@@ -215,9 +239,7 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
               aria-invalid={Boolean(errors.agreed)}
               aria-describedby={errors.agreed ? "agreed-error" : undefined}
             />
-            <span>
-              I want to add this course to My learning.
-            </span>
+            <span>I want to add this course to My learning.</span>
           </label>
           {errors.agreed && (
             <span className="field-error" id="agreed-error">
@@ -225,8 +247,12 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
             </span>
           )}
 
-          <button className="button" type="submit">
-            Confirm enrolment
+          <button
+            className="button"
+            type="submit"
+            disabled={pending.includes(courseId)}
+          >
+            {pending.includes(courseId) ? "Enrolling…" : "Confirm enrolment"}
           </button>
         </form>
       </div>

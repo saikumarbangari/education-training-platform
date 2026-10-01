@@ -1,4 +1,9 @@
-export function filterCourses(courses, query = "", category = "All", level = "All") {
+export function filterCourses(
+  courses,
+  query = "",
+  category = "All",
+  level = "All",
+) {
   const term = query.trim().toLowerCase();
 
   return courses.filter((course) => {
@@ -19,6 +24,10 @@ export function filterCourses(courses, query = "", category = "All", level = "Al
 export function courseProgress(course, enrolment) {
   if (!course || !enrolment || course.modules.length === 0) return 0;
   return Math.round(
-    (enrolment.completedModules.length / course.modules.length) * 100,
+    (course.modules.filter((module) =>
+      enrolment.completedModules.includes(module.id),
+    ).length /
+      course.modules.length) *
+      100,
   );
 }

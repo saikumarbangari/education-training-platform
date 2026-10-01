@@ -26,9 +26,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    linear-gradient(#d5dde5 1px, transparent 1px),
-    var(--desk);
+  background: linear-gradient(#d5dde5 1px, transparent 1px), var(--desk);
   background-size: 100% 32px;
 }
 
@@ -92,6 +90,7 @@ h3 {
 }
 
 .skip-link {
+  opacity: 0;
   position: fixed;
   z-index: 100;
   top: 0.75rem;
@@ -103,6 +102,7 @@ h3 {
 }
 
 .skip-link:focus {
+  opacity: 1;
   transform: translateY(0);
 }
 
@@ -145,7 +145,9 @@ h3 {
   border-radius: 3px 3px 8px 3px;
   color: white;
   background: var(--blue);
-  font: 800 1.45rem/1 "Trebuchet MS", sans-serif;
+  font:
+    800 1.45rem/1 "Trebuchet MS",
+    sans-serif;
   box-shadow: 4px 4px 0 var(--yellow);
 }
 
@@ -156,13 +158,17 @@ h3 {
 }
 
 .brand strong {
-  font: 800 1.15rem/1 "Trebuchet MS", sans-serif;
+  font:
+    800 1.15rem/1 "Trebuchet MS",
+    sans-serif;
 }
 
 .brand small {
   margin-top: 0.22rem;
   color: var(--muted);
-  font: 0.68rem/1.2 Consolas, monospace;
+  font:
+    0.68rem/1.2 Consolas,
+    monospace;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -334,7 +340,9 @@ h3 {
 .mini-trail > p {
   margin-bottom: 1.7rem;
   color: #dfe9f4;
-  font: 700 0.78rem/1.2 Consolas, monospace;
+  font:
+    700 0.78rem/1.2 Consolas,
+    monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -377,7 +385,9 @@ h3 {
   border-radius: 50%;
   color: var(--ink);
   background: var(--yellow);
-  font: 700 0.85rem/1 Consolas, monospace;
+  font:
+    700 0.85rem/1 Consolas,
+    monospace;
 }
 
 .course-section {
@@ -426,7 +436,10 @@ h3 {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(170px, 0.38fr) minmax(150px, 0.3fr);
+  grid-template-columns: minmax(260px, 1fr) minmax(170px, 0.38fr) minmax(
+      150px,
+      0.3fr
+    );
   margin-bottom: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--rule);
@@ -517,7 +530,9 @@ h3 {
   border-radius: 0 var(--radius) var(--radius) var(--radius);
   background: var(--paper);
   box-shadow: 5px 5px 0 var(--shadow);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .course-card:hover {
@@ -533,7 +548,9 @@ h3 {
   border-radius: 0 0 5px 0;
   color: white;
   background: var(--blue);
-  font: 700 0.75rem/1.2 Consolas, monospace;
+  font:
+    700 0.75rem/1.2 Consolas,
+    monospace;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -723,7 +740,9 @@ h3 {
   border-radius: 50%;
   color: var(--blue-dark);
   background: var(--paper);
-  font: 800 0.95rem/1 Consolas, monospace;
+  font:
+    800 0.95rem/1 Consolas,
+    monospace;
 }
 
 .learning-trail li:first-child > span {
@@ -811,7 +830,9 @@ h3 {
 
 .form-heading > span {
   color: var(--blue);
-  font: 800 1.8rem/1 Consolas, monospace;
+  font:
+    800 1.8rem/1 Consolas,
+    monospace;
 }
 
 .form-heading h2,
@@ -896,7 +917,9 @@ h3 {
   border-block: 1px dashed var(--rule);
   color: var(--blue-dark);
   background: #f2f5f8;
-  font: 700 0.8rem/1.3 Consolas, monospace;
+  font:
+    700 0.8rem/1.3 Consolas,
+    monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -947,7 +970,9 @@ h3 {
   border: 1px solid var(--rule);
   border-radius: 50%;
   background: white;
-  font: 700 0.75rem/1 Consolas, monospace;
+  font:
+    700 0.75rem/1 Consolas,
+    monospace;
 }
 
 .goal-note {
@@ -1042,7 +1067,9 @@ progress::-moz-progress-bar {
 .progress-ledger dd {
   margin: 0.15rem 0 0;
   color: var(--blue-dark);
-  font: 800 1.8rem/1 Consolas, monospace;
+  font:
+    800 1.8rem/1 Consolas,
+    monospace;
 }
 
 .next-step {
@@ -1265,5 +1292,142 @@ progress::-moz-progress-bar {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Account, attendance and course management use the same worksheet panels. */
+.header-inner {
+  flex-wrap: wrap;
+}
+.header-inner nav {
+  min-width: 0;
+}
+.nav-list {
+  flex-wrap: wrap;
+}
+.account-bar,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.account-bar {
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  margin: -1rem 0 1.7rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.9rem;
+}
+button.text-link {
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+input[readonly] {
+  color: var(--muted);
+  background: var(--desk);
+}
+.auth-page {
+  max-width: 620px;
+  margin: 0 auto;
+}
+.auth-page .enrol-form {
+  margin-bottom: 2rem;
+}
+.attendance-grid,
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+.history-panel {
+  padding: 1.6rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  border-top: 5px solid var(--yellow);
+}
+.attendance-history,
+.admin-course-list {
+  padding: 0;
+  list-style: none;
+}
+.attendance-history li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.attendance-history strong,
+.attendance-history time,
+.attendance-history span {
+  display: block;
+}
+.attendance-history time,
+.attendance-history span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.success-note {
+  padding: 1rem;
+  border-left: 4px solid var(--green);
+  background: #e3f0e9;
+}
+.confirm-panel {
+  padding: 1.2rem;
+  margin: 1rem 0;
+  border: 1px solid var(--red);
+  background: #fff4ee;
+}
+.venue-note {
+  padding: 0.8rem 0;
+  border-block: 1px solid var(--rule);
+}
+.admin-course-list li {
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+.admin-course-list h3,
+.admin-course-list p {
+  margin-bottom: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.danger-link {
+  color: var(--red);
+}
+.learning-card > .button-row {
+  padding: 0 1.6rem 1.2rem;
+}
+.learning-card .confirm-panel {
+  margin: 0 1.6rem 1.2rem;
+}
+.admin-form,
+.attendance-grid > *,
+.admin-grid > * {
+  min-width: 0;
+}
+.enrol-form .field-hint {
+  margin-block: 0.4rem 1rem;
+}
+@media (max-width: 780px) {
+  .attendance-grid,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .header-inner nav {
+    width: 100%;
+  }
+  .nav-list {
+    justify-content: flex-start;
+    gap: 0.2rem 0.65rem;
+  }
+  .account-bar {
+    margin-top: 0;
   }
 }

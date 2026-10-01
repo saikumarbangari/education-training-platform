@@ -22,7 +22,11 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
         title="Progress unavailable"
         headingLevel="h1"
         action={
-          <button className="button button--small" type="button" onClick={onRetry}>
+          <button
+            className="button button--small"
+            type="button"
+            onClick={onRetry}
+          >
             Try again
           </button>
         }
@@ -35,7 +39,9 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
   const records = enrolments
     .map((enrolment) => {
       const course = courses.find((item) => item.id === enrolment.courseId);
-      return course ? { course, enrolment, progress: courseProgress(course, enrolment) } : null;
+      return course
+        ? { course, enrolment, progress: courseProgress(course, enrolment) }
+        : null;
     })
     .filter(Boolean);
   const completed = records.filter((record) => record.progress === 100).length;
@@ -52,7 +58,9 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
       <header className="page-heading">
         <p className="eyebrow">Progress overview</p>
         <h1>See where you are up to</h1>
-        <p>A simple summary of the courses and modules saved on this device.</p>
+        <p>
+          A simple summary of the courses and modules saved to your account.
+        </p>
       </header>
 
       {!records.length ? (
@@ -68,7 +76,10 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
         </Feedback>
       ) : (
         <>
-          <section className="progress-ledger" aria-labelledby="summary-heading">
+          <section
+            className="progress-ledger"
+            aria-labelledby="summary-heading"
+          >
             <div>
               <p className="eyebrow">Your record</p>
               <h2 id="summary-heading">Learning summary</h2>
@@ -97,7 +108,9 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
               <div>
                 <p className="eyebrow">Suggested next step</p>
                 <h2 id="next-heading">{nextModule.title}</h2>
-                <p>Continue {nextRecord.course.title} from your learning list.</p>
+                <p>
+                  Continue {nextRecord.course.title} from your learning list.
+                </p>
               </div>
               <Link className="button button--small" to="/learning">
                 Open my learning
@@ -105,7 +118,10 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
             </section>
           )}
 
-          <section className="progress-courses" aria-labelledby="course-progress-heading">
+          <section
+            className="progress-courses"
+            aria-labelledby="course-progress-heading"
+          >
             <h2 id="course-progress-heading">Progress by course</h2>
             {records.map(({ course, progress }) => (
               <article key={course.id}>
@@ -113,7 +129,10 @@ export default function ProgressPage({ courses, loading, error, onRetry }) {
                   <p className="eyebrow">{course.category}</p>
                   <h3>{course.title}</h3>
                 </div>
-                <ProgressBar value={progress} label={`${course.title} progress`} />
+                <ProgressBar
+                  value={progress}
+                  label={`${course.title} progress`}
+                />
               </article>
             ))}
           </section>
