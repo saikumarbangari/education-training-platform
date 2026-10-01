@@ -107,8 +107,9 @@ Hash-based routing keeps every view usable on simple static hosting without serv
 Existing frontend URL: [https://saikumarbangari.github.io/education-training-platform/](https://saikumarbangari.github.io/education-training-platform/)
 
 The full-stack frontend stays on this GitHub Pages site. Pages serves static files; the
-Express API and PostgreSQL database must be hosted separately. These local changes do
-not update the live site until they are pushed and deployed.
+Express API and PostgreSQL database are hosted separately. The configured API is
+`https://education-training-platform-api.onrender.com/api`, backed by Neon PostgreSQL
+in Sydney. The Render web service uses the Free plan in Singapore.
 
 ### Free hosting setup: Neon and Render
 
@@ -121,7 +122,7 @@ not update the live site until they are pushed and deployed.
    PostgreSQL connection string. It contains a password: keep it out of Git, screenshots,
    the report and chat. Enter it only in the backend host's `DATABASE_URL` setting.
 3. After the integration branch is pushed to the existing repository, create a Render
-   Blueprint from it. The checked-in `render.yaml` selects a Free Node web service in
+   web service using the settings in `render.yaml`, or use it as a Blueprint. It selects a Free Node web service in
    Singapore, uses the `codex/assessment-3-full-stack` branch and disables automatic
    deployments. This lets the backend be tested before merging the frontend to `main`.
 4. Enter the Neon connection string when Render requests `DATABASE_URL`. No database,
@@ -131,13 +132,16 @@ not update the live site until they are pushed and deployed.
    `ADMIN_PASSWORD` (10–128 characters) in Render's private environment settings and
    deploy. Use a separate email that has not registered as a learner. The hosted startup
    creates an administrator only if that email does not already exist. It never promotes
-   an existing learner or resets a password. Remove `ADMIN_PASSWORD` afterwards.
+   an existing learner or resets a password. Save the password privately, then remove
+   `ADMIN_PASSWORD` from Render when it is no longer needed for setup.
 6. Copy the service's actual HTTPS URL from Render; do not guess the hostname. Run
    `pnpm check:hosted https://YOUR-SERVICE.onrender.com/api` to verify health, catalogue,
    protected routes and CORS without writing test records.
-7. Set the GitHub repository Actions variable `VITE_API_URL` to that HTTPS URL ending in
-   `/api`. Review and merge the integration branch only after the backend check passes.
-   The existing Pages workflow then publishes the frontend at the unchanged website URL.
+7. The Pages workflow includes this project's public API URL. To use a different backend,
+   set the GitHub repository Actions variable `VITE_API_URL` to its HTTPS URL ending in
+   `/api`. Never use a database connection string here. Review and merge the integration
+   branch only after the backend check passes. The workflow checks the hosted API before
+   building and publishing the frontend at the unchanged website URL.
 
 The hosted entry point runs the schema and initial seed in a transaction. A database
 marker prevents later restarts from restoring deliberately deleted courses. A failed
@@ -167,8 +171,8 @@ phone location test and live sign-in/progress test remain necessary after deploy
    `https://your-api-host.example/api`. This is a public URL, not a secret. Never add a database
    URL or password to a `VITE_` variable: these values are included in the browser bundle.
 5. Keep Pages configured to use GitHub Actions. Once the integration is reviewed and merged
-   to `main`, the existing workflow tests, builds and publishes `dist`. A missing HTTPS API
-   URL stops the build before deployment, preserving the last published site.
+   to `main`, the existing workflow tests, checks the hosted API, builds and publishes `dist`.
+   An invalid API URL or failed health check stops deployment, preserving the last published site.
 6. Verify sign-in, admin access, saving progress and phone check-in on the live URL. The
   hash router and `/education-training-platform/` asset path are retained.
 

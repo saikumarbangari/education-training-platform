@@ -23,5 +23,5 @@ jobs:
       - run: pnpm build
         env:
           # Validate bundling without requiring hosting credentials on pull requests.
-          # Only deploy-pages.yml publishes, with the real repository API variable.
+          # Only deploy-pages.yml publishes, with the configured public API URL.
           VITE_BASE_PATH: /

@@ -16,6 +16,10 @@ concurrency:
 
 jobs:
   deploy:
+    env:
+      # The API URL is public. An Actions variable can override it for another host.
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'https://education-training-platform-api.onrender.com/api' }}
+      VITE_BASE_PATH: /education-training-platform/
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -39,11 +43,11 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Check hosted backend
+        run: pnpm check:hosted "$VITE_API_URL"
+
       - name: Build
         run: pnpm build
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_BASE_PATH: /education-training-platform/
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
