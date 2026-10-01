@@ -41,6 +41,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_BASE_PATH: /education-training-platform/
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
