@@ -7,6 +7,18 @@ import EnrolPage from "./pages/EnrolPage.jsx";
 import LearningPage from "./pages/LearningPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ProgressPage from "./pages/ProgressPage.jsx";
+import AuthPage from "./pages/AuthPage.jsx";
+import AttendancePage from "./pages/AttendancePage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import RequireAuth from "./components/RequireAuth.jsx";
+import LearningGate from "./components/LearningGate.jsx";
+import { api } from "./api/client.js";
+
+const learnerView = (page) => (
+  <RequireAuth>
+    <LearningGate>{page}</LearningGate>
+  </RequireAuth>
+);
 
 export default function App() {
   const [courseState, setCourseState] = useState({
@@ -26,18 +38,18 @@ export default function App() {
 
     async function fetchCourses() {
       try {
-        const response = await fetch("./data/courses.json", {
+        const { courses } = await api("/courses", {
           signal: controller.signal,
         });
-        if (!response.ok) throw new Error(`Request failed (${response.status})`);
-        const courses = await response.json();
-        setCourseState({ courses, loading: false, error: "" });
+        if (!controller.signal.aborted)
+          setCourseState({ courses, loading: false, error: "" });
       } catch (error) {
-        if (error.name !== "AbortError") {
+        if (!controller.signal.aborted) {
           setCourseState({
             courses: [],
             loading: false,
-            error: "Courses could not be loaded. Check your connection and try again.",
+            error:
+              "Courses could not be loaded. Check your connection and try again.",
           });
         }
       }
@@ -60,15 +72,37 @@ export default function App() {
         />
         <Route
           path="courses/:courseId/enrol"
-          element={<EnrolPage {...courseState} onRetry={loadCourses} />}
+          element={learnerView(
+            <EnrolPage {...courseState} onRetry={loadCourses} />,
+          )}
         />
         <Route
           path="learning"
-          element={<LearningPage {...courseState} onRetry={loadCourses} />}
+          element={learnerView(
+            <LearningPage {...courseState} onRetry={loadCourses} />,
+          )}
         />
         <Route
           path="progress"
-          element={<ProgressPage {...courseState} onRetry={loadCourses} />}
+          element={learnerView(
+            <ProgressPage {...courseState} onRetry={loadCourses} />,
+          )}
+        />
+        <Route path="login" element={<AuthPage />} />
+        <Route path="register" element={<AuthPage register />} />
+        <Route
+          path="attendance"
+          element={learnerView(
+            <AttendancePage {...courseState} onRetry={loadCourses} />,
+          )}
+        />
+        <Route
+          path="admin"
+          element={
+            <RequireAuth admin>
+              <AdminPage onChange={loadCourses} />
+            </RequireAuth>
+          }
         />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

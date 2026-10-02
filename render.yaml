@@ -1,0 +1,28 @@
+# This deploys only the API. The frontend remains on GitHub Pages.
+services:
+  - type: web
+    name: education-training-platform-api
+    runtime: node
+    plan: free
+    region: singapore
+    repo: https://github.com/saikumarbangari/education-training-platform
+    branch: main
+    autoDeployTrigger: "off"
+    buildCommand: corepack pnpm install --prod --frozen-lockfile
+    startCommand: node server/start-hosted.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_ORIGIN
+        value: https://saikumarbangari.github.io
+      - key: SESSION_DAYS
+        value: "7"
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_URL
+        sync: false

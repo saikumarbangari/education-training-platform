@@ -1,0 +1,27 @@
+name: Check project
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          # Validate bundling without requiring hosting credentials on pull requests.
+          # Only deploy-pages.yml publishes, with the configured public API URL.
+          VITE_BASE_PATH: /

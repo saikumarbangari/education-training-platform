@@ -1,10 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
-const navClass = ({ isActive }) => (isActive ? "nav-link is-active" : "nav-link");
+const navClass = ({ isActive }) =>
+  isActive ? "nav-link is-active" : "nav-link";
 
 export default function AppLayout() {
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
+  const [logoutError, setLogoutError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function logout() {
+    setBusy(true);
+    setLogoutError("");
+    try {
+      await signOut();
+    } catch (error) {
+      setLogoutError(error.message);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -48,12 +65,47 @@ export default function AppLayout() {
                   Progress
                 </NavLink>
               </li>
+              <li>
+                <NavLink className={navClass} to="/attendance">
+                  Attendance
+                </NavLink>
+              </li>
+              {user?.role === "admin" && (
+                <li>
+                  <NavLink className={navClass} to="/admin">
+                    Manage courses
+                  </NavLink>
+                </li>
+              )}
+              {!user && (
+                <li>
+                  <NavLink className={navClass} to="/login">
+                    Sign in
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
       </header>
 
       <main id="main-content" className="site-main" tabIndex="-1">
+        {user && (
+          <div className="account-bar">
+            <span>
+              Signed in as <strong>{user.fullName}</strong>
+            </span>
+            <button className="text-link" onClick={logout} disabled={busy}>
+              {busy ? "Signing out…" : "Sign out"}
+            </button>
+          </div>
+        )}
+        {logoutError && (
+          <p className="error-summary" role="alert">
+            Sign-out failed. {logoutError} Please try again before leaving this
+            shared device.
+          </p>
+        )}
         <Outlet />
       </main>
 

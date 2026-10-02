@@ -28,18 +28,34 @@ const courses = [
 ];
 
 test("course filters work together", () => {
-  assert.deepEqual(filterCourses(courses, "css", "Web development", "Beginner"), [courses[0]]);
+  assert.deepEqual(
+    filterCourses(courses, "css", "Web development", "Beginner"),
+    [courses[0]],
+  );
   assert.equal(filterCourses(courses, "missing").length, 0);
 });
 
 test("course catalogue contains at least ten unique courses", () => {
   assert.ok(courseData.length >= 10);
-  assert.equal(new Set(courseData.map((course) => course.id)).size, courseData.length);
+  assert.equal(
+    new Set(courseData.map((course) => course.id)).size,
+    courseData.length,
+  );
 });
 
 test("enrolment validation catches missing details", () => {
-  const errors = validateEnrolment({ fullName: "", email: "wrong", goal: "short", agreed: false });
-  assert.deepEqual(Object.keys(errors), ["fullName", "email", "goal", "agreed"]);
+  const errors = validateEnrolment({
+    fullName: "",
+    email: "wrong",
+    goal: "short",
+    agreed: false,
+  });
+  assert.deepEqual(Object.keys(errors), [
+    "fullName",
+    "email",
+    "goal",
+    "agreed",
+  ]);
   assert.deepEqual(
     validateEnrolment({
       fullName: "Sam Lee",
@@ -53,4 +69,15 @@ test("enrolment validation catches missing details", () => {
 
 test("progress is derived from completed modules", () => {
   assert.equal(courseProgress(courses[0], { completedModules: ["one"] }), 50);
+});
+
+test("progress ignores removed modules and duplicate completion IDs", () => {
+  assert.equal(
+    courseProgress(courses[0], { completedModules: ["one", "one", "removed"] }),
+    50,
+  );
+  assert.equal(
+    courseProgress({ modules: [] }, { completedModules: ["one"] }),
+    0,
+  );
 });

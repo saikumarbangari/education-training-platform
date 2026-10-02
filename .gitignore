@@ -1,5 +1,12 @@
 node_modules/
 dist/
+output/
 tmp/
 .DS_Store
 *.local
+.env
+.env.*
+!.env.example
+.local-db/
+playwright-report/
+test-results/

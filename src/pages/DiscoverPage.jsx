@@ -59,7 +59,11 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
         </div>
       </section>
 
-      <section id="course-finder" className="course-section" aria-labelledby="courses-heading">
+      <section
+        id="course-finder"
+        className="course-section"
+        aria-labelledby="courses-heading"
+      >
         <div className="section-heading">
           <div>
             <p className="eyebrow">Course finder</p>
@@ -68,7 +72,11 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
           <p>All courses are short enough to fit around work and study.</p>
         </div>
 
-        <form className="filters" role="search" onSubmit={(event) => event.preventDefault()}>
+        <form
+          className="filters"
+          role="search"
+          onSubmit={(event) => event.preventDefault()}
+        >
           <div className="field field--search">
             <label htmlFor="course-search">Search by course or skill</label>
             <input
@@ -108,13 +116,17 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
               <option>All</option>
               <option>Beginner</option>
               <option>Intermediate</option>
+              <option>Advanced</option>
             </select>
           </div>
         </form>
 
         {loading && (
           <Feedback title="Loading courses">
-            <p>The course list is on its way.</p>
+            <p>
+              The course list is on its way. After a quiet period, the free
+              server may need about a minute to start.
+            </p>
           </Feedback>
         )}
 
@@ -123,7 +135,11 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
             tone="error"
             title="Course list unavailable"
             action={
-              <button className="button button--small" type="button" onClick={onRetry}>
+              <button
+                className="button button--small"
+                type="button"
+                onClick={onRetry}
+              >
                 Try again
               </button>
             }
@@ -144,7 +160,9 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
                   <CourseCard
                     key={course.id}
                     course={course}
-                    enrolled={enrolments.some((item) => item.courseId === course.id)}
+                    enrolled={enrolments.some(
+                      (item) => item.courseId === course.id,
+                    )}
                   />
                 ))}
               </div>
@@ -152,7 +170,11 @@ export default function DiscoverPage({ courses, loading, error, onRetry }) {
               <Feedback
                 title="No courses match those filters"
                 action={
-                  <button className="button button--small" type="button" onClick={clearFilters}>
+                  <button
+                    className="button button--small"
+                    type="button"
+                    onClick={clearFilters}
+                  >
                     Clear filters
                   </button>
                 }
