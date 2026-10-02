@@ -90,8 +90,13 @@ export default function EnrolPage({ courses, loading, error, onRetry }) {
       ...current,
       [name]: type === "checkbox" ? checked : value,
     }));
+    setSubmitError("");
     if (errors[name]) {
-      setErrors((current) => ({ ...current, [name]: "" }));
+      setErrors((current) => {
+        const remaining = { ...current };
+        delete remaining[name];
+        return remaining;
+      });
     }
   }
 

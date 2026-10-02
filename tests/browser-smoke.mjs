@@ -181,10 +181,50 @@ try {
   await expect(
     page.getByRole("heading", { name: `Join ${course.title}` }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Confirm enrolment" }).click();
+  await expect(page.locator(".error-summary")).toBeFocused();
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
   await page
     .getByLabel("What do you want to achieve?")
     .fill("Build a useful small programming project.");
   await page.getByLabel("I want to add this course to My learning.").check();
+  await expect(page.locator(".error-summary")).toHaveCount(0);
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveAttribute(
+    "aria-invalid",
+    "false",
+  );
+
+  await page.route("**/api/enrolments", (route) =>
+    route.request().method() === "POST"
+      ? route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          headers: { "access-control-allow-origin": origin },
+          body: JSON.stringify({
+            message: "Enrolment is unavailable. Try again.",
+          }),
+        })
+      : route.continue(),
+  );
+  await page.getByRole("button", { name: "Confirm enrolment" }).click();
+  await expect(page.locator(".error-summary")).toHaveText(
+    "Enrolment is unavailable. Try again.",
+  );
+  await expect(page.locator(".error-summary")).toBeFocused();
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveValue(
+    "Build a useful small programming project.",
+  );
+  await expect(
+    page.getByRole("button", { name: "Confirm enrolment" }),
+  ).toBeEnabled();
+  await page.unroute("**/api/enrolments");
+  await page
+    .getByLabel("What do you want to achieve?")
+    .fill("Build and test a useful small programming project.");
+  await expect(page.locator(".error-summary")).toHaveCount(0);
   await page.getByRole("button", { name: "Confirm enrolment" }).click();
   await expect(
     page.getByRole("heading", { name: "Your current courses" }),
@@ -196,7 +236,9 @@ try {
   ).toBeVisible();
   await page.reload();
   await expect(firstModule).toBeChecked();
-  console.log("PASS register, guarded route, enrol, progress and page refresh");
+  console.log(
+    "PASS enrolment validation recovery, failed-save retry, progress and refresh",
+  );
 
   await page.route("**/api/enrolments/*/progress", (route) => route.abort());
   await firstModule.click();
