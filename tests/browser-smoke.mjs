@@ -181,10 +181,50 @@ try {
   await expect(
     page.getByRole("heading", { name: `Join ${course.title}` }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Confirm enrolment" }).click();
+  await expect(page.locator(".error-summary")).toBeFocused();
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
   await page
     .getByLabel("What do you want to achieve?")
     .fill("Build a useful small programming project.");
   await page.getByLabel("I want to add this course to My learning.").check();
+  await expect(page.locator(".error-summary")).toHaveCount(0);
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveAttribute(
+    "aria-invalid",
+    "false",
+  );
+
+  await page.route("**/api/enrolments", (route) =>
+    route.request().method() === "POST"
+      ? route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          headers: { "access-control-allow-origin": origin },
+          body: JSON.stringify({
+            message: "Enrolment is unavailable. Try again.",
+          }),
+        })
+      : route.continue(),
+  );
+  await page.getByRole("button", { name: "Confirm enrolment" }).click();
+  await expect(page.locator(".error-summary")).toHaveText(
+    "Enrolment is unavailable. Try again.",
+  );
+  await expect(page.locator(".error-summary")).toBeFocused();
+  await expect(page.getByLabel("What do you want to achieve?")).toHaveValue(
+    "Build a useful small programming project.",
+  );
+  await expect(
+    page.getByRole("button", { name: "Confirm enrolment" }),
+  ).toBeEnabled();
+  await page.unroute("**/api/enrolments");
+  await page
+    .getByLabel("What do you want to achieve?")
+    .fill("Build and test a useful small programming project.");
+  await expect(page.locator(".error-summary")).toHaveCount(0);
   await page.getByRole("button", { name: "Confirm enrolment" }).click();
   await expect(
     page.getByRole("heading", { name: "Your current courses" }),
@@ -196,7 +236,9 @@ try {
   ).toBeVisible();
   await page.reload();
   await expect(firstModule).toBeChecked();
-  console.log("PASS register, guarded route, enrol, progress and page refresh");
+  console.log(
+    "PASS enrolment validation recovery, failed-save retry, progress and refresh",
+  );
 
   await page.route("**/api/enrolments/*/progress", (route) => route.abort());
   await firstModule.click();
@@ -229,6 +271,18 @@ try {
     .fill("Practise another programming language.");
   await page.getByLabel("I want to add this course to My learning.").check();
   await page.getByRole("button", { name: "Confirm enrolment" }).click();
+  await expect(page.locator(".learning-card")).toHaveCount(2);
+  await goto("/progress");
+  const summaryCount = (label) =>
+    page
+      .locator(".progress-ledger dl div")
+      .filter({ has: page.getByText(label, { exact: true }) })
+      .locator("dd");
+  await expect(summaryCount("Enrolled")).toHaveText("2");
+  await expect(summaryCount("Not started")).toHaveText("1");
+  await expect(summaryCount("In progress")).toHaveText("1");
+  await expect(summaryCount("Completed")).toHaveText("0");
+  await goto("/learning");
   const secondCard = page.locator(".learning-card").filter({
     has: page.getByRole("heading", { name: secondCourse.title, exact: true }),
   });
@@ -249,6 +303,12 @@ try {
   console.log("PASS withdrawal cancellation and owner-scoped withdrawal");
 
   await goto("/attendance");
+  await page
+    .getByRole("button", { name: "Share location and check in" })
+    .click();
+  await expect(
+    page.getByText("Choose a course before checking in."),
+  ).toBeVisible();
   await page.getByLabel("Your course", { exact: true }).selectOption(course.id);
   await context.setGeolocation({ latitude: -33.85, longitude: 151.2093 });
   await page
@@ -256,13 +316,36 @@ try {
     .click();
   await expect(page.getByText(/Move within 250 metres/)).toBeVisible();
   await context.setGeolocation({ latitude: -33.8688, longitude: 151.2093 });
+  let releaseCheckIn;
+  const saveGate = new Promise((resolve) => {
+    releaseCheckIn = resolve;
+  });
+  await page.route("**/api/attendance/check-in", async (route) => {
+    if (route.request().method() === "POST") await saveGate;
+    await route.continue();
+  });
   await page
     .getByRole("button", { name: "Share location and check in" })
     .click();
+  try {
+    await expect(
+      page.getByRole("button", { name: "Saving attendance…", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByLabel("Your course", { exact: true }),
+    ).toBeDisabled();
+    await expect(page.getByRole("status")).toHaveText("Saving your check-in…");
+  } finally {
+    releaseCheckIn();
+  }
   await expect(
     page.getByText("Attendance recorded. You are checked in."),
   ).toBeVisible();
+  await page.unroute("**/api/attendance/check-in");
   await expect(page.locator(".attendance-history li")).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Share location and check in" }),
+  ).toBeEnabled();
   await page.screenshot({
     path: `${screenshots}/attendance-desktop.png`,
     fullPage: true,
@@ -275,8 +358,11 @@ try {
     timeout: 20000,
   });
   await expect(page.locator(".attendance-history li")).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Share location and check in" }),
+  ).toBeEnabled();
   console.log(
-    "PASS location outside venue, successful check-in and denied permission",
+    "PASS course selection, pending attendance save, outside venue and denied permission",
   );
 
   const learnerToken = await page.evaluate(() =>
@@ -427,6 +513,16 @@ try {
   await expect(
     page.getByRole("heading", { name: "Progress by course" }),
   ).toBeVisible();
+  await expect(summaryCount("Enrolled")).toHaveText("1");
+  await expect(summaryCount("Not started")).toHaveText("0");
+  await expect(summaryCount("In progress")).toHaveText("1");
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    ),
+    false,
+    "Progress summary overflows the mobile viewport",
+  );
   await page.screenshot({
     path: `${screenshots}/progress-mobile.png`,
     fullPage: true,
