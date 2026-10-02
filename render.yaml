@@ -6,7 +6,7 @@ services:
     plan: free
     region: singapore
     repo: https://github.com/saikumarbangari/education-training-platform
-    branch: codex/assessment-3-full-stack
+    branch: main
     autoDeployTrigger: "off"
     buildCommand: corepack pnpm install --prod --frozen-lockfile
     startCommand: node server/start-hosted.js

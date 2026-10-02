@@ -121,10 +121,11 @@ in Sydney. The Render web service uses the Free plan in Singapore.
    accounts and does not need Neon Auth. Use the project's Connect dialog to obtain the
    PostgreSQL connection string. It contains a password: keep it out of Git, screenshots,
    the report and chat. Enter it only in the backend host's `DATABASE_URL` setting.
-3. After the integration branch is pushed to the existing repository, create a Render
+3. After the project is pushed to `main` in the existing repository, create a Render
    web service using the settings in `render.yaml`, or use it as a Blueprint. It selects a Free Node web service in
-   Singapore, uses the `codex/assessment-3-full-stack` branch and disables automatic
-   deployments. This lets the backend be tested before merging the frontend to `main`.
+   Singapore, uses the `main` branch and disables automatic deployments. Deploy backend
+   updates manually after the project checks pass. For an existing Render service, set
+   its deployment branch to `main` in the dashboard before deleting an old branch.
 4. Enter the Neon connection string when Render requests `DATABASE_URL`. No database,
    persistent disk, cron job or paid service is defined in the Blueprint. Confirm the
    service plan is Free before creating it. If either provider requires payment, stop.

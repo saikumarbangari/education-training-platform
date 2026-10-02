@@ -3,7 +3,7 @@ name: Check project
 on:
   pull_request:
   push:
-    branches: [codex/assessment-3-full-stack]
+    branches: [main]
 
 permissions:
   contents: read
