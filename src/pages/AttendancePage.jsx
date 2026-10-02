@@ -40,7 +40,8 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
   const [courseId, setCourseId] = useState("");
   const [message, setMessage] = useState("");
   const [checkError, setCheckError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState("");
+  const busy = stage !== "";
   const active = useRef(false);
   const mounted = useRef(true);
   const enrolledCourses = courses.filter((course) =>
@@ -81,10 +82,11 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
       return;
     }
     active.current = true;
-    setBusy(true);
+    setStage("locating");
     try {
       const position = await locate();
       if (!mounted.current) return;
+      setStage("saving");
       await api("/attendance/check-in", {
         method: "POST",
         token,
@@ -101,7 +103,7 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
       if (mounted.current) setCheckError(error.message);
     } finally {
       active.current = false;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) setStage("");
     }
   }
 
@@ -168,8 +170,19 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
                 venue. It saves the distance and time, not your coordinates.
               </p>
               <button className="button" disabled={busy}>
-                {busy ? "Checking location…" : "Share location and check in"}
+                {stage === "saving"
+                  ? "Saving attendance…"
+                  : busy
+                    ? "Checking location…"
+                    : "Share location and check in"}
               </button>
+              {busy && (
+                <p className="field-hint" role="status">
+                  {stage === "saving"
+                    ? "Saving your check-in…"
+                    : "Reading your device location…"}
+                </p>
+              )}
             </form>
           ) : (
             <p>
