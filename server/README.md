@@ -79,6 +79,12 @@ never include password hashes, session tokens or venue coordinates. Attendance
 history may include courses a learner has left; deleting a course removes its
 enrolments and attendance through the existing database rules.
 
+Attendance requests first try a precise location, then retry once with normal
+accuracy after a timeout or unavailable position. Each attempt waits up to 20 seconds
+and requires a fresh position so a previous location is not reused. Denied permission is not
+retried. Cancelling or leaving the page during location lookup prevents a check-in
+request. The server still checks enrolment and distance from the configured venue.
+
 Protected routes use `Authorization: Bearer <token>`. The database stores only a SHA-256
 hash of each random token. Passwords use a unique salt and Node's `scrypt` function. Device
 coordinates are used transiently to calculate venue distance; raw learner coordinates are

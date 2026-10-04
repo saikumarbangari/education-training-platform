@@ -4,31 +4,7 @@ import { api } from "../api/client.js";
 import Feedback from "../components/Feedback.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useLearning } from "../context/LearningContext.jsx";
-
-function locate() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation)
-      return reject(
-        new Error(
-          "This browser cannot share location. Ask your trainer to record attendance separately.",
-        ),
-      );
-    navigator.geolocation.getCurrentPosition(
-      resolve,
-      (error) =>
-        reject(
-          new Error(
-            {
-              1: "Location permission was denied. Allow location in your browser settings, or ask your trainer to record attendance separately.",
-              2: "Your location is unavailable. Try again near the venue, or ask your trainer for help.",
-              3: "The location request timed out. Try again, or ask your trainer for help.",
-            }[error.code] || "Location could not be read. Please try again.",
-          ),
-        ),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
-    );
-  });
-}
+import { locate } from "../utils/location.js";
 
 export default function AttendancePage({ courses, loading, error, onRetry }) {
   const { token } = useAuth();
@@ -44,6 +20,7 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
   const busy = stage !== "";
   const active = useRef(false);
   const mounted = useRef(true);
+  const locationRequest = useRef(null);
   const enrolledCourses = courses.filter((course) =>
     enrolments.some((item) => item.courseId === course.id),
   );
@@ -52,6 +29,7 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      locationRequest.current?.abort();
     };
   }, []);
 
@@ -83,9 +61,16 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
     }
     active.current = true;
     setStage("locating");
+    const controller = new AbortController();
+    locationRequest.current = controller;
     try {
-      const position = await locate();
-      if (!mounted.current) return;
+      const position = await locate({
+        signal: controller.signal,
+        onRetry: () => {
+          if (mounted.current) setStage("retrying");
+        },
+      });
+      if (!mounted.current || controller.signal.aborted) return;
       setStage("saving");
       await api("/attendance/check-in", {
         method: "POST",
@@ -100,7 +85,11 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
       setMessage("Attendance recorded. You are checked in.");
       setRevision((n) => n + 1);
     } catch (error) {
-      if (mounted.current) setCheckError(error.message);
+      if (mounted.current) {
+        if (error.name === "AbortError")
+          setMessage("Location check cancelled. No attendance was saved.");
+        else setCheckError(error.message);
+      }
     } finally {
       active.current = false;
       if (mounted.current) setStage("");
@@ -176,11 +165,22 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
                     ? "Checking location…"
                     : "Share location and check in"}
               </button>
+              {(stage === "locating" || stage === "retrying") && (
+                <button
+                  className="text-link cancel-location"
+                  type="button"
+                  onClick={() => locationRequest.current?.abort()}
+                >
+                  Cancel location check
+                </button>
+              )}
               {busy && (
                 <p className="field-hint" role="status">
                   {stage === "saving"
                     ? "Saving your check-in…"
-                    : "Reading your device location…"}
+                    : stage === "retrying"
+                      ? "A precise location was not available. Trying another location method…"
+                      : "Reading your device location… Allow location when your browser asks. This can take up to 40 seconds after permission is granted."}
                 </p>
               )}
             </form>
@@ -202,6 +202,11 @@ export default function AttendancePage({ courses, loading, error, onRetry }) {
               {message}
             </p>
           )}
+          <p className="field-hint">
+            If location is slow, turn on your device’s Location services and
+            Wi-Fi. Try again near the venue, preferably on a phone. A check-in
+            is only saved after the server accepts your location.
+          </p>
           <p className="field-hint">
             Location sharing is optional. If it is unavailable or you prefer not
             to share it, ask your trainer to record attendance separately. This

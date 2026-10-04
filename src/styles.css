@@ -1473,6 +1473,10 @@ input[readonly] {
 .record-pagination {
   margin-block: 1rem;
 }
+.cancel-location {
+  display: block;
+  margin-top: 0.75rem;
+}
 @media (max-width: 780px) {
   .attendance-grid,
   .admin-grid,

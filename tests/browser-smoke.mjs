@@ -14,6 +14,10 @@ import react from "@vitejs/plugin-react";
 import { configurePool, closePool } from "../server/db.js";
 import { prepareDatabase } from "../server/bootstrap.js";
 import { checkLearnerDashboard } from "./dashboard-browser.mjs";
+import {
+  checkLocationFailures,
+  forceLocationFallback,
+} from "./location-browser.mjs";
 
 async function freePort() {
   const server = createServer();
@@ -322,6 +326,7 @@ try {
     .click();
   await expect(page.getByText(/Move within 250 metres/)).toBeVisible();
   await context.setGeolocation({ latitude: -33.8688, longitude: 151.2093 });
+  await forceLocationFallback(page);
   let releaseCheckIn;
   const saveGate = new Promise((resolve) => {
     releaseCheckIn = resolve;
@@ -357,6 +362,13 @@ try {
     fullPage: true,
   });
   await context.clearPermissions();
+  assert.deepEqual(await page.evaluate(() => window.locationAttempts), [
+    true,
+    false,
+  ]);
+  await page.evaluate(() => {
+    delete navigator.geolocation.getCurrentPosition;
+  });
   await page
     .getByRole("button", { name: "Share location and check in" })
     .click();
@@ -371,6 +383,7 @@ try {
     "PASS course selection, pending attendance save, outside venue and denied permission",
   );
 
+  await checkLocationFailures({ page, goto, pool });
   await goto("/admin/learners");
   await expect(
     page.getByRole("heading", { name: "Administrator access required" }),
