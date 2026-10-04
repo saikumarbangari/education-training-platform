@@ -92,6 +92,11 @@ export default function AdminPage({ onChange }) {
   const newCourseButton = useRef(null);
 
   useEffect(() => {
+    if (!removing && message === "Course deleted.")
+      newCourseButton.current?.focus();
+  }, [removing, message]);
+
+  useEffect(() => {
     if (deleting) deleteSummary.current?.focus();
   }, [deleting]);
 
@@ -218,7 +223,6 @@ export default function AdminPage({ onChange }) {
       deleteTrigger.current = null;
       setMessage("Course deleted.");
       onChange();
-      requestAnimationFrame(() => newCourseButton.current?.focus());
     } catch (error) {
       setDeleteError(error.message);
       requestAnimationFrame(() => deleteSummary.current?.focus());

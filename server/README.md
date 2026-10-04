@@ -69,6 +69,15 @@ requires a shared limiter store. Database backups and credential rotation are ho
 | DELETE | `/api/enrolments/:courseId`          | Signed in | Leave a course                           |
 | GET    | `/api/attendance/me`                 | Signed in | List attendance records                  |
 | POST   | `/api/attendance/check-in`           | Signed in | Validate device coordinates and check in |
+| GET    | `/api/admin/learners`                | Admin     | Search learner names and emails          |
+| GET    | `/api/admin/learners/:learnerId`     | Admin     | View enrolments, progress and attendance |
+
+The Learners dashboard is read-only. The list accepts `q` (up to 100 characters)
+and `page`; learner details accept `page` for attendance history. Lists contain
+25 records per page. Administrator accounts are not included. These responses
+never include password hashes, session tokens or venue coordinates. Attendance
+history may include courses a learner has left; deleting a course removes its
+enrolments and attendance through the existing database rules.
 
 Protected routes use `Authorization: Bearer <token>`. The database stores only a SHA-256
 hash of each random token. Passwords use a unique salt and Node's `scrypt` function. Device

@@ -11,6 +11,7 @@ Waypoint Learning lets users find programming courses, enrol, track their progre
 - A progress summary showing not-started, ongoing and completed courses.
 - Location-based attendance with the learner's permission.
 - Administrator tools to add, edit and delete courses.
+- A read-only Learners dashboard for administrators to search accounts and view enrolments, progress and attendance.
 - Responsive layouts for desktop and mobile.
 
 Built with React, Vite, React Router, Express and PostgreSQL.

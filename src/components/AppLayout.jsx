@@ -72,8 +72,15 @@ export default function AppLayout() {
               </li>
               {user?.role === "admin" && (
                 <li>
-                  <NavLink className={navClass} to="/admin">
+                  <NavLink className={navClass} to="/admin" end>
                     Manage courses
+                  </NavLink>
+                </li>
+              )}
+              {user?.role === "admin" && (
+                <li>
+                  <NavLink className={navClass} to="/admin/learners">
+                    Learners
                   </NavLink>
                 </li>
               )}

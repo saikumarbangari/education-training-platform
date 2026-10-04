@@ -10,6 +10,8 @@ import ProgressPage from "./pages/ProgressPage.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import LearnersPage from "./pages/LearnersPage.jsx";
+import LearnerPage from "./pages/LearnerPage.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import LearningGate from "./components/LearningGate.jsx";
 import { api } from "./api/client.js";
@@ -101,6 +103,22 @@ export default function App() {
           element={
             <RequireAuth admin>
               <AdminPage onChange={loadCourses} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="admin/learners"
+          element={
+            <RequireAuth admin>
+              <LearnersPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="admin/learners/:learnerId"
+          element={
+            <RequireAuth admin>
+              <LearnerPage />
             </RequireAuth>
           }
         />

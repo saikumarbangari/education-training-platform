@@ -7,6 +7,7 @@ import attendanceRoutes from "./routes/attendance.js";
 import authRoutes from "./routes/auth.js";
 import courseRoutes from "./routes/courses.js";
 import enrolmentRoutes from "./routes/enrolments.js";
+import learnerRoutes from "./routes/learners.js";
 
 const app = express();
 const allowedOrigins = (
@@ -72,6 +73,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/enrolments", enrolmentRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/admin/learners", learnerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

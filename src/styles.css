@@ -1415,9 +1415,68 @@ input[readonly] {
 .enrol-form .field-hint {
   margin-block: 0.4rem 1rem;
 }
+.learner-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.learner-search .field {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.learner-list,
+.learner-enrolments {
+  list-style: none;
+  padding: 0;
+}
+.learner-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.2rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+.learner-list li > div {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+.learner-list h3,
+.learner-list p {
+  margin-bottom: 0.4rem;
+}
+.learners-page,
+.learner-record-page {
+  overflow-wrap: anywhere;
+}
+.learner-record-page > .button-row {
+  margin-bottom: 1.5rem;
+}
+.learner-record-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+.learner-record-grid > * {
+  min-width: 0;
+}
+.learner-enrolments li {
+  border-bottom: 1px solid var(--rule);
+  padding-block: 1rem;
+}
+.record-pagination {
+  margin-block: 1rem;
+}
 @media (max-width: 780px) {
   .attendance-grid,
-  .admin-grid {
+  .admin-grid,
+  .learner-record-grid {
     grid-template-columns: 1fr;
   }
   .header-inner nav {

@@ -17,7 +17,7 @@
     "preview": "vite preview",
     "test": "node --test tests/*.test.js",
     "test:e2e": "node tests/browser-smoke.mjs",
-    "test:server": "node --test tests/server-logic.test.js tests/api-integration.test.js",
+    "test:server": "node --test tests/server-logic.test.js tests/api-integration.test.js tests/learners-api.test.js",
     "format": "prettier --write src server tests vite.config.js package.json pnpm-workspace.yaml .github/workflows/deploy-pages.yml",
     "format:check": "prettier --check src server tests vite.config.js package.json pnpm-workspace.yaml .github/workflows/deploy-pages.yml",
     "check": "pnpm test && pnpm build"

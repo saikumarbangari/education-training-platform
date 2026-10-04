@@ -45,8 +45,8 @@ export default function RequireAuth({ children, admin = false }) {
         }
       >
         <p>
-          Your account can enrol in courses and record progress, but cannot edit
-          courses.
+          Your account can enrol in courses and record progress, but cannot
+          manage courses or view other learners’ records.
         </p>
       </Feedback>
     );

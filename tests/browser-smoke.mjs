@@ -13,6 +13,7 @@ import { build, preview } from "vite";
 import react from "@vitejs/plugin-react";
 import { configurePool, closePool } from "../server/db.js";
 import { prepareDatabase } from "../server/bootstrap.js";
+import { checkLearnerDashboard } from "./dashboard-browser.mjs";
 
 async function freePort() {
   const server = createServer();
@@ -150,6 +151,11 @@ try {
       "utf8",
     ),
   )[0];
+
+  await goto("/admin/learners");
+  await expect(
+    page.getByRole("heading", { name: "Sign in", exact: true }),
+  ).toBeVisible();
 
   await goto("/");
   await expect(page.locator(".course-card")).toHaveCount(10);
@@ -364,6 +370,14 @@ try {
   console.log(
     "PASS course selection, pending attendance save, outside venue and denied permission",
   );
+
+  await goto("/admin/learners");
+  await expect(
+    page.getByRole("heading", { name: "Administrator access required" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Learners", exact: true }),
+  ).toHaveCount(0);
 
   const learnerToken = await page.evaluate(() =>
     sessionStorage.getItem("waypoint-session"),
@@ -659,6 +673,15 @@ try {
   console.log(
     "PASS administrator CRUD, keyboard delete cancellation and failed-delete recovery",
   );
+
+  await checkLearnerDashboard({
+    page,
+    goto,
+    pool,
+    course,
+    origin,
+    screenshots,
+  });
 
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of [
