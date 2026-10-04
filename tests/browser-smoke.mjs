@@ -569,20 +569,95 @@ try {
   await page
     .getByRole("button", { name: "Delete Updated Test Course", exact: true })
     .click();
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  const deletePanel = page.locator(".confirm-panel");
+  await expect(deletePanel).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Confirm delete", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Cancel", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("button", {
+      name: "Delete Updated Test Course",
+      exact: true,
+    }),
+  ).toBeFocused();
+  await expect(deletePanel).toHaveCount(0);
   await expect(page.locator(".admin-course-list li")).toHaveCount(11);
   await page
     .getByRole("button", { name: "Delete Updated Test Course", exact: true })
     .click();
+  await page.route("**/api/courses/browser-test-course", (route) =>
+    route.request().method() === "DELETE"
+      ? route.fulfill({
+          status: 503,
+          json: { message: "Course deletion temporarily unavailable." },
+        })
+      : route.continue(),
+  );
   await page
     .getByRole("button", { name: "Confirm delete", exact: true })
     .click();
+  await expect(deletePanel).toContainText(
+    "Course deletion temporarily unavailable.",
+  );
+  await expect(deletePanel).toBeFocused();
+  await expect(adminSummary).toHaveCount(0);
+  await expect(page.locator(".admin-course-list li")).toHaveCount(11);
+  await expect(
+    page.getByRole("button", { name: "Confirm delete", exact: true }),
+  ).toBeEnabled();
+  await page.unroute("**/api/courses/browser-test-course");
+
+  let releaseDelete;
+  const deleteGate = new Promise((resolve) => {
+    releaseDelete = resolve;
+  });
+  await page.route("**/api/courses/browser-test-course", async (route) => {
+    if (route.request().method() === "DELETE") await deleteGate;
+    await route.continue();
+  });
+  try {
+    await page
+      .getByRole("button", { name: "Confirm delete", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Deleting…", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "Cancel", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "Save course", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "New course", exact: true }),
+    ).toBeDisabled();
+    await expect(deletePanel).not.toContainText(
+      "Course deletion temporarily unavailable.",
+    );
+  } finally {
+    releaseDelete();
+  }
   await expect(
     page.getByText("Course deleted.", { exact: true }),
   ).toBeVisible();
+  await page.unroute("**/api/courses/browser-test-course");
+  await expect(
+    page.getByRole("button", { name: "New course", exact: true }),
+  ).toBeFocused();
+  await expect(deletePanel).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Add a course", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Course ID", { exact: true })).toHaveValue("");
   await expect(page.locator(".admin-course-list li")).toHaveCount(10);
   console.log(
-    "PASS administrator create, update, cancelled delete and confirmed delete",
+    "PASS administrator CRUD, keyboard delete cancellation and failed-delete recovery",
   );
 
   await page.setViewportSize({ width: 390, height: 844 });

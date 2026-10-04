@@ -80,11 +80,16 @@ export default function AdminPage({ onChange }) {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const busy = saving || removing;
   const [deleting, setDeleting] = useState(null);
   const heading = useRef(null);
   const summary = useRef(null);
   const deleteSummary = useRef(null);
+  const deleteTrigger = useRef(null);
+  const newCourseButton = useRef(null);
 
   useEffect(() => {
     if (deleting) deleteSummary.current?.focus();
@@ -112,6 +117,7 @@ export default function AdminPage({ onChange }) {
     setEditing(course?.id || "");
     setErrors({});
     setSaveError("");
+    setDeleteError("");
     setMessage("");
     setDeleting(null);
     requestAnimationFrame(() => heading.current?.focus());
@@ -162,7 +168,7 @@ export default function AdminPage({ onChange }) {
       requestAnimationFrame(() => summary.current?.focus());
       return;
     }
-    setBusy(true);
+    setSaving(true);
     try {
       const { course } = await api(
         editing ? `/courses/${editing}` : "/courses",
@@ -182,14 +188,20 @@ export default function AdminPage({ onChange }) {
       setErrors(error.errors || {});
       requestAnimationFrame(() => summary.current?.focus());
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
+  }
+
+  function cancelDelete() {
+    setDeleting(null);
+    setDeleteError("");
+    requestAnimationFrame(() => deleteTrigger.current?.focus());
   }
 
   async function remove() {
     if (busy || !deleting) return;
-    setBusy(true);
-    setSaveError("");
+    setRemoving(true);
+    setDeleteError("");
     setMessage("");
     try {
       await api(`/courses/${deleting.id}`, { method: "DELETE", token });
@@ -199,14 +211,19 @@ export default function AdminPage({ onChange }) {
       if (editing === deleting.id) {
         setValues(blank);
         setEditing("");
+        setErrors({});
+        setSaveError("");
       }
       setDeleting(null);
+      deleteTrigger.current = null;
       setMessage("Course deleted.");
       onChange();
+      requestAnimationFrame(() => newCourseButton.current?.focus());
     } catch (error) {
-      setSaveError(error.message);
+      setDeleteError(error.message);
+      requestAnimationFrame(() => deleteSummary.current?.focus());
     } finally {
-      setBusy(false);
+      setRemoving(false);
     }
   }
 
@@ -231,6 +248,7 @@ export default function AdminPage({ onChange }) {
             <h2 id="course-list-heading">Course list</h2>
             <button
               className="button button--small"
+              ref={newCourseButton}
               disabled={busy}
               onClick={() => edit(null)}
             >
@@ -277,9 +295,11 @@ export default function AdminPage({ onChange }) {
                       className="text-link danger-link"
                       disabled={busy}
                       aria-label={`Delete ${course.title}`}
-                      onClick={() => {
+                      onClick={(event) => {
+                        deleteTrigger.current = event.currentTarget;
                         setDeleting(course);
-                        setSaveError("");
+                        setDeleteError("");
+                        setMessage("");
                       }}
                     >
                       Delete
@@ -293,27 +313,28 @@ export default function AdminPage({ onChange }) {
             <div
               className="confirm-panel"
               role="alert"
+              aria-labelledby="delete-course-heading"
               tabIndex="-1"
               ref={deleteSummary}
             >
-              <h3>Delete {deleting.title}?</h3>
+              <h3 id="delete-course-heading">Delete {deleting.title}?</h3>
               <p>
                 This also removes every enrolment and attendance record for this
                 course. This cannot be undone from the app.
               </p>
-              {saveError && <p className="field-error">{saveError}</p>}
+              {deleteError && <p className="field-error">{deleteError}</p>}
               <div className="button-row">
                 <button
                   className="button button--small"
                   disabled={busy}
                   onClick={remove}
                 >
-                  Confirm delete
+                  {removing ? "Deleting…" : "Confirm delete"}
                 </button>
                 <button
                   className="button button--secondary button--small"
                   disabled={busy}
-                  onClick={() => setDeleting(null)}
+                  onClick={cancelDelete}
                 >
                   Cancel
                 </button>
@@ -420,7 +441,7 @@ export default function AdminPage({ onChange }) {
             )}
           </div>
           <button className="button" disabled={busy}>
-            {busy ? "Saving…" : "Save course"}
+            {saving ? "Saving…" : "Save course"}
           </button>
         </form>
       </div>
