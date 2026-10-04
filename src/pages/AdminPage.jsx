@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client.js";
 import Feedback from "../components/Feedback.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { validateCourse } from "../../server/validation.js";
 
 const blank = {
   id: "",
@@ -52,6 +53,7 @@ const fields = [
     "Between 25 and 5000 metres.",
   ],
 ];
+const coordinateFields = ["venueLatitude", "venueLongitude"];
 
 function toForm(course) {
   return {
@@ -78,11 +80,16 @@ export default function AdminPage({ onChange }) {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const busy = saving || removing;
   const [deleting, setDeleting] = useState(null);
   const heading = useRef(null);
   const summary = useRef(null);
   const deleteSummary = useRef(null);
+  const deleteTrigger = useRef(null);
+  const newCourseButton = useRef(null);
 
   useEffect(() => {
     if (deleting) deleteSummary.current?.focus();
@@ -110,17 +117,28 @@ export default function AdminPage({ onChange }) {
     setEditing(course?.id || "");
     setErrors({});
     setSaveError("");
+    setDeleteError("");
     setMessage("");
     setDeleting(null);
     requestAnimationFrame(() => heading.current?.focus());
   }
 
+  function updateField(name, value) {
+    setValues((current) => ({ ...current, [name]: value }));
+    setSaveError("");
+    setMessage("");
+    setErrors((current) => {
+      const remaining = { ...current };
+      delete remaining[name];
+      if (coordinateFields.includes(name)) delete remaining.venue;
+      return remaining;
+    });
+  }
+
   async function save(event) {
     event.preventDefault();
     if (busy) return;
-    setBusy(true);
     setSaveError("");
-    setErrors({});
     setMessage("");
     const body = {
       ...values,
@@ -144,6 +162,13 @@ export default function AdminPage({ onChange }) {
         values.venueLongitude === "" ? null : Number(values.venueLongitude),
       checkInRadiusMetres: Number(values.checkInRadiusMetres),
     };
+    const nextErrors = validateCourse(body);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      requestAnimationFrame(() => summary.current?.focus());
+      return;
+    }
+    setSaving(true);
     try {
       const { course } = await api(
         editing ? `/courses/${editing}` : "/courses",
@@ -163,14 +188,20 @@ export default function AdminPage({ onChange }) {
       setErrors(error.errors || {});
       requestAnimationFrame(() => summary.current?.focus());
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
+  }
+
+  function cancelDelete() {
+    setDeleting(null);
+    setDeleteError("");
+    requestAnimationFrame(() => deleteTrigger.current?.focus());
   }
 
   async function remove() {
     if (busy || !deleting) return;
-    setBusy(true);
-    setSaveError("");
+    setRemoving(true);
+    setDeleteError("");
     setMessage("");
     try {
       await api(`/courses/${deleting.id}`, { method: "DELETE", token });
@@ -180,14 +211,19 @@ export default function AdminPage({ onChange }) {
       if (editing === deleting.id) {
         setValues(blank);
         setEditing("");
+        setErrors({});
+        setSaveError("");
       }
       setDeleting(null);
+      deleteTrigger.current = null;
       setMessage("Course deleted.");
       onChange();
+      requestAnimationFrame(() => newCourseButton.current?.focus());
     } catch (error) {
-      setSaveError(error.message);
+      setDeleteError(error.message);
+      requestAnimationFrame(() => deleteSummary.current?.focus());
     } finally {
-      setBusy(false);
+      setRemoving(false);
     }
   }
 
@@ -212,6 +248,7 @@ export default function AdminPage({ onChange }) {
             <h2 id="course-list-heading">Course list</h2>
             <button
               className="button button--small"
+              ref={newCourseButton}
               disabled={busy}
               onClick={() => edit(null)}
             >
@@ -258,9 +295,11 @@ export default function AdminPage({ onChange }) {
                       className="text-link danger-link"
                       disabled={busy}
                       aria-label={`Delete ${course.title}`}
-                      onClick={() => {
+                      onClick={(event) => {
+                        deleteTrigger.current = event.currentTarget;
                         setDeleting(course);
-                        setSaveError("");
+                        setDeleteError("");
+                        setMessage("");
                       }}
                     >
                       Delete
@@ -274,27 +313,28 @@ export default function AdminPage({ onChange }) {
             <div
               className="confirm-panel"
               role="alert"
+              aria-labelledby="delete-course-heading"
               tabIndex="-1"
               ref={deleteSummary}
             >
-              <h3>Delete {deleting.title}?</h3>
+              <h3 id="delete-course-heading">Delete {deleting.title}?</h3>
               <p>
                 This also removes every enrolment and attendance record for this
                 course. This cannot be undone from the app.
               </p>
-              {saveError && <p className="field-error">{saveError}</p>}
+              {deleteError && <p className="field-error">{deleteError}</p>}
               <div className="button-row">
                 <button
                   className="button button--small"
                   disabled={busy}
                   onClick={remove}
                 >
-                  Confirm delete
+                  {removing ? "Deleting…" : "Confirm delete"}
                 </button>
                 <button
                   className="button button--secondary button--small"
                   disabled={busy}
-                  onClick={() => setDeleting(null)}
+                  onClick={cancelDelete}
                 >
                   Cancel
                 </button>
@@ -306,35 +346,47 @@ export default function AdminPage({ onChange }) {
           <h2 tabIndex="-1" ref={heading}>
             {editing ? "Edit course" : "Add a course"}
           </h2>
-          {saveError && (
+          {(saveError || Object.keys(errors).length > 0) && (
             <div
               className="error-summary"
               role="alert"
               tabIndex="-1"
               ref={summary}
             >
-              <strong>{saveError}</strong>
+              <strong>{saveError || "Check the highlighted fields."}</strong>
               {Object.keys(errors).length > 0 && (
                 <ul>
-                  {Object.entries(errors).map(([field, error]) => (
-                    <li key={field}>
-                      <a
-                        href={`#admin-${field}`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          document.getElementById(`admin-${field}`)?.focus();
-                        }}
-                      >
-                        {error}
-                      </a>
-                    </li>
-                  ))}
+                  {Object.entries(errors).map(([field, error]) => {
+                    const target = field === "venue" ? "venueLatitude" : field;
+                    return (
+                      <li key={field}>
+                        <a
+                          href={`#admin-${target}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            document.getElementById(`admin-${target}`)?.focus();
+                          }}
+                        >
+                          {error}
+                        </a>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
           )}
           {fields.map(([name, label, type = "text", hint]) => {
             const Tag = type === "textarea" ? "textarea" : "input";
+            const venueError =
+              coordinateFields.includes(name) && Boolean(errors.venue);
+            const descriptions = [
+              hint && `admin-${name}-hint`,
+              errors[name] && `admin-${name}-error`,
+              venueError && "admin-venue-error",
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <div className="field" key={name}>
                 <label htmlFor={`admin-${name}`}>{label}</label>
@@ -346,17 +398,9 @@ export default function AdminPage({ onChange }) {
                   value={values[name]}
                   readOnly={name === "id" && Boolean(editing)}
                   disabled={busy}
-                  onChange={(event) =>
-                    setValues({ ...values, [name]: event.target.value })
-                  }
-                  aria-invalid={Boolean(errors[name])}
-                  aria-describedby={
-                    errors[name]
-                      ? `admin-${name}-error`
-                      : hint
-                        ? `admin-${name}-hint`
-                        : undefined
-                  }
+                  onChange={(event) => updateField(name, event.target.value)}
+                  aria-invalid={Boolean(errors[name]) || venueError}
+                  aria-describedby={descriptions || undefined}
                 />
                 {hint && (
                   <span className="field-hint" id={`admin-${name}-hint`}>
@@ -372,7 +416,7 @@ export default function AdminPage({ onChange }) {
             );
           })}
           {errors.venue && (
-            <p className="field-error" id="admin-venue">
+            <p className="field-error" id="admin-venue-error">
               {errors.venue}
             </p>
           )}
@@ -382,17 +426,22 @@ export default function AdminPage({ onChange }) {
               id="admin-level"
               value={values.level}
               disabled={busy}
-              onChange={(event) =>
-                setValues({ ...values, level: event.target.value })
-              }
+              onChange={(event) => updateField("level", event.target.value)}
+              aria-invalid={Boolean(errors.level)}
+              aria-describedby={errors.level ? "admin-level-error" : undefined}
             >
               {["Beginner", "Intermediate", "Advanced"].map((level) => (
                 <option key={level}>{level}</option>
               ))}
             </select>
+            {errors.level && (
+              <span className="field-error" id="admin-level-error">
+                {errors.level}
+              </span>
+            )}
           </div>
           <button className="button" disabled={busy}>
-            {busy ? "Saving…" : "Save course"}
+            {saving ? "Saving…" : "Save course"}
           </button>
         </form>
       </div>
