@@ -426,9 +426,40 @@ try {
   ).toBeVisible();
   console.log("PASS role checks, owner isolation and logout revocation");
 
+  const adminSummary = page.locator(".admin-form .error-summary");
+  let adminCreateRequests = 0;
+  const countAdminCreates = (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/api/courses")) {
+      adminCreateRequests += 1;
+    }
+  };
+  page.on("request", countAdminCreates);
+  await page.getByRole("button", { name: "Save course", exact: true }).click();
+  await expect(adminSummary).toBeFocused();
+  await expect(page.getByLabel("Course ID", { exact: true })).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
+  assert.equal(
+    adminCreateRequests,
+    0,
+    "Invalid courses should not be submitted",
+  );
+  await adminSummary.getByRole("link", { name: /lowercase course ID/ }).click();
+  await expect(page.getByLabel("Course ID", { exact: true })).toBeFocused();
   await page
     .getByLabel("Course ID", { exact: true })
     .fill("browser-test-course");
+  await expect(page.getByLabel("Course ID", { exact: true })).toHaveAttribute(
+    "aria-invalid",
+    "false",
+  );
+  await expect(
+    adminSummary.getByRole("link", { name: /lowercase course ID/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByLabel("Course title", { exact: true }),
+  ).toHaveAttribute("aria-invalid", "true");
   await page
     .getByLabel("Course title", { exact: true })
     .fill("Browser Test Course");
@@ -442,10 +473,88 @@ try {
   await page.getByLabel("Skills", { exact: true }).fill("Testing, JavaScript");
   await page
     .getByLabel("Modules", { exact: true })
+    .fill("first | First module\nfirst | Duplicate module");
+  await page.getByRole("button", { name: "Save course", exact: true }).click();
+  await expect(adminSummary).toBeFocused();
+  assert.equal(
+    adminCreateRequests,
+    0,
+    "Duplicate module IDs must be corrected",
+  );
+  await adminSummary
+    .getByRole("link", { name: /unique IDs and titles/ })
+    .click();
+  await expect(page.getByLabel("Modules", { exact: true })).toBeFocused();
+  await page
+    .getByLabel("Modules", { exact: true })
     .fill("first | First module\nsecond | Second module");
+  await expect(adminSummary).toHaveCount(0);
+  await expect(page.getByLabel("Modules", { exact: true })).toHaveAttribute(
+    "aria-invalid",
+    "false",
+  );
+
+  await page.getByLabel("Venue latitude", { exact: true }).fill("-33.8688");
+  await page.getByRole("button", { name: "Save course", exact: true }).click();
+  await expect(adminSummary).toBeFocused();
+  await adminSummary
+    .getByRole("link", { name: "Provide both venue coordinates." })
+    .click();
+  await expect(
+    page.getByLabel("Venue latitude", { exact: true }),
+  ).toBeFocused();
+  for (const label of ["Venue latitude", "Venue longitude"]) {
+    await expect(page.getByLabel(label, { exact: true })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await expect(page.getByLabel(label, { exact: true })).toHaveAttribute(
+      "aria-describedby",
+      /admin-venue-error/,
+    );
+  }
+  await page.locator(".admin-form").screenshot({
+    path: `${screenshots}/admin-validation.png`,
+  });
+  await page.getByLabel("Venue longitude", { exact: true }).fill("151.2093");
+  await expect(adminSummary).toHaveCount(0);
+  await expect(page.locator("#admin-venue-error")).toHaveCount(0);
+  await expect(
+    page.getByLabel("Venue latitude", { exact: true }),
+  ).toHaveAttribute("aria-invalid", "false");
+
+  await page.route("**/api/courses", (route) =>
+    route.request().method() === "POST"
+      ? route.fulfill({
+          status: 503,
+          json: { message: "Course service temporarily unavailable." },
+        })
+      : route.continue(),
+  );
+  await page.getByRole("button", { name: "Save course", exact: true }).click();
+  await expect(adminSummary).toBeFocused();
+  await expect(adminSummary).toContainText(
+    "Course service temporarily unavailable.",
+  );
+  await expect(page.getByLabel("Course title", { exact: true })).toHaveValue(
+    "Browser Test Course",
+  );
+  await expect(page.locator(".admin-course-list li")).toHaveCount(10);
+  await expect(
+    page.getByRole("button", { name: "Save course", exact: true }),
+  ).toBeEnabled();
+  await page
+    .getByLabel("Summary", { exact: true })
+    .fill("A temporary browser test course.");
+  await expect(adminSummary).toHaveCount(0);
+  await page.unroute("**/api/courses");
   await page.getByRole("button", { name: "Save course", exact: true }).click();
   await expect(page.getByText("Course saved.", { exact: true })).toBeVisible();
   await expect(page.locator(".admin-course-list li")).toHaveCount(11);
+  page.off("request", countAdminCreates);
+  console.log(
+    "PASS administrator validation, error focus and failed-save recovery",
+  );
   await page
     .getByLabel("Course title", { exact: true })
     .fill("Updated Test Course");
